@@ -40,6 +40,19 @@ type effect = string option
 
 type npm_package_path = string * string 
 
+type package_name = string 
+
+type path = string 
+
+type package_info = 
+  | AmdJS of path 
+  | CommonJS of path
+  | Goog
+
+type packages_info = 
+  (package_name * package_info) option
+(** we don't force people to use package *)
+
 type t = {
   values : cmj_value String_map.t;
   effect : effect;

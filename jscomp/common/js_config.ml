@@ -115,7 +115,7 @@ let get_output_dir filename =
       Filename.dirname filename
     else 
       Filename.dirname filename
-  | Some (_package_name, x) -> 
+  | Some (_, x) -> 
     Lazy.force Ext_filename.package_dir // x
     
 
