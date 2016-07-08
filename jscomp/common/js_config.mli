@@ -43,6 +43,7 @@ val get_goog_package_name : unit -> string option
 
 val set_npm_package_path : string -> unit 
 val get_npm_package_path : unit -> (string * string) option
+val set_package_name : string -> unit 
 
 val cross_module_inline : bool ref
 val set_cross_module_inline : bool -> unit

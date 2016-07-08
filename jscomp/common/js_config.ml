@@ -78,19 +78,49 @@ let get_goog_package_name () =
 
 let npm_package_path = ref None 
 
+type path = string 
+
+type package_info = 
+  | AmdJS of path 
+  | CommonJS of path
+  | Goog
+type package_name  = string
+type packages_info = (package_name * package_info list) option
+(** we don't force people to use package *)
+
+let packages_info = ref None
+
+let set_package_name name = 
+  match !packages_info with
+  | None -> packages_info := Some(name, [])
+  | Some _ -> 
+    Ext_pervasives.bad_argf "duplicated flag for -bs-package-name"
+
 let set_npm_package_path s = 
-  match Ext_string.split ~keep_empty:false s ':' with 
-  | [ package_name; path]  -> 
-    if String.length package_name = 0 then   
-    (* TODO: check more [package_name] if it is a valid package name *)
+  if !packages_info = None then 
+    Ext_pervasives.bad_argf "please set package name first using -bs-package-name "
+  else 
+    npm_package_path  := Some s 
+  (* match Ext_string.split ~keep_empty:false s ':' with  *)
+  (* | [ package_name; path]  ->  *)
+  (*   if String.length package_name = 0 then    *)
+  (*   (\* TODO: check more [package_name] if it is a valid package name *\) *)
 
-      Ext_pervasives.bad_argf "invalid npm package path: %s" s
-    else 
-      npm_package_path := Some (package_name, path)
-  | _ -> 
-    Ext_pervasives.bad_argf "invalid npm package path: %s" s
+  (*     Ext_pervasives.bad_argf "invalid npm package path: %s" s *)
+  (*   else  *)
+  (*     npm_package_path := Some (package_name, path) *)
+  (* | _ ->  *)
+  (*   Ext_pervasives.bad_argf "invalid npm package path: %s" s *)
 
-let get_npm_package_path () = !npm_package_path
+let get_npm_package_path () = 
+  match !packages_info with 
+  | None -> None 
+  | Some (name, _) -> 
+    begin match !npm_package_path with 
+    | Some package_path -> 
+      Some (name, package_path)
+    | None -> assert false 
+    end
 
 let cross_module_inline = ref false
 

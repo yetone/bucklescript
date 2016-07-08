@@ -25,7 +25,7 @@ $(addsuffix .cmi, $(OTHERS)): js.cmi
 RUNTIME := $(addsuffix .cmj, $(SOURCE_LIST)) 
 
 
-COMPFLAGS += $(MODULE_FLAGS) -I ../stdlib -nostdlib -nopervasives -open Pervasives -w -40 -bs-npm-output-path $(npm_package_name):lib/js -bs-no-check-div-by-zero -bs-cross-module-opt -bs-diagnose
+COMPFLAGS += $(MODULE_FLAGS) -I ../stdlib -nostdlib -nopervasives -open Pervasives -w -40 -bs-package-name $(npm_package_name) -bs-package-output-path lib/js -bs-no-check-div-by-zero -bs-cross-module-opt -bs-diagnose
 
 
 

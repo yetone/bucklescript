@@ -64,7 +64,10 @@ let set_noassert () =
 
 
 let buckle_script_flags = 
-  ("-bs-npm-output-path", Arg.String Js_config.set_npm_package_path, 
+  ("-bs-package-name", Arg.String Js_config.set_package_name, 
+   " set package name, useful when you want to produce npm packages")
+  ::
+  ("-bs-package-output-path", Arg.String Js_config.set_npm_package_path, 
    " set npm-output-path: package-name:path, for example `bs-platform:lib/js`")
   ::
   ("-bs-npm-package-include", Arg.String add_include_path, 
