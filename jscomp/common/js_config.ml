@@ -35,17 +35,21 @@ type env =
   | AmdJS
   | Goog (* of string option *)
 
+let default_env = ref NodeJS 
+
 type path = string 
 
-type package_info = 
-  | AmdJS of path 
-  | CommonJS of path
-  | Goog
+type package_info = env * string
+
+  (* | AmdJS of path *)
+  (* | NodeJS of path *)
+  (* | Goog *)
+
 type package_name  = string
-type packages_info = (package_name * package_info list) option
+type  packages_info = (package_name * package_info list) option
 (** we don't force people to use package *)
 
-let default_env = ref NodeJS 
+
 
 let ext = ref ".js"
 let cmj_ext = ".cmj"
@@ -55,7 +59,7 @@ let get_env () = !default_env
 let set_env env = default_env := env 
 
 
-let npm_package_path = ref None 
+(* let npm_package_path = ref None  *)
 
 
 let packages_info : packages_info ref = ref None
@@ -73,37 +77,38 @@ let set_package_name name =
   | Some _ -> 
     Ext_pervasives.bad_argf "duplicated flag for -bs-package-name"
 
-let cmd_set_module str = 
-  match str with 
-  | "commonjs" -> default_env := NodeJS
-  | "amdjs" -> 
-    default_env := AmdJS
-  | "goog"
-    -> default_env := Goog 
-  | _ ->
-    Ext_pervasives.bad_argf "invalid module system %s" str
 
 let set_npm_package_path s = 
-  if !packages_info = None then 
+  match !packages_info  with 
+  | None -> 
     Ext_pervasives.bad_argf "please set package name first using -bs-package-name ";
-  match Ext_string.split ~keep_empty:false s ':' with
-  | [ package_name; path]  ->
-    cmd_set_module package_name ; 
-    npm_package_path := Some path
-  | [path] ->
-    default_env := NodeJS;
-    npm_package_path := Some path
-  | _ -> 
-    Ext_pervasives.bad_argf "invalid npm package path: %s" s
+  | Some (name, envs) -> 
+    let env, path = 
+      match Ext_string.split ~keep_empty:false s ':' with
+      | [ package_name; path]  ->
+        (match package_name with 
+         | "commonjs" -> NodeJS
+         | "amdjs" -> AmdJS
+         | "goog" -> Goog 
+         | _ ->
+           Ext_pervasives.bad_argf "invalid module system %s" package_name), path
+      | [path] ->
+        NodeJS, path
+      | _ -> 
+        Ext_pervasives.bad_argf "invalid npm package path: %s" s
+    in
+    packages_info := Some (name, (env,path) :: envs)
+    (* default_env := env , npm_package_path := Some path *)
+
 
 let get_npm_package_path () = 
   match !packages_info with 
   | None -> None 
-  | Some (name, _) -> 
-    begin match !npm_package_path with 
-    | Some package_path -> 
+  | Some (name, paths) -> 
+    begin match paths with 
+    | (_ , package_path) :: _ -> 
       Some (name, package_path)
-    | None -> assert false 
+    | [] -> None
     end
 
 let cross_module_inline = ref false
