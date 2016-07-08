@@ -1659,12 +1659,11 @@ let pp_deps_program ( program  : J.deps_program) (f : Ext_pp.t) =
            (* amd_program f program *)
          | _ -> amd_program f program
        end 
-     | Goog opt -> 
+     | Goog  -> 
        let goog_package = 
          let v = Js_config.get_module_name () in
-         match opt with 
+         match Js_config.get_package_name () with 
          | None 
-         | Some ""
            -> v 
          | Some x -> x ^ "." ^ v 
        in 

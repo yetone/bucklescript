@@ -31,7 +31,7 @@ type env =
   | Browser
   | NodeJS
   | AmdJS
-  | Goog of string option
+  | Goog 
 
 val cmj_ext : string 
 val get_env : unit -> env
@@ -39,11 +39,15 @@ val get_ext : unit -> string
 
 val get_output_dir : string -> string 
 val get_output_file : string -> string
-val get_goog_package_name : unit -> string option
+
 
 val set_npm_package_path : string -> unit 
+
+(** return [package_name] and [path] *)
 val get_npm_package_path : unit -> (string * string) option
+
 val set_package_name : string -> unit 
+val get_package_name : unit -> string option
 
 val cross_module_inline : bool ref
 val set_cross_module_inline : bool -> unit
@@ -54,7 +58,7 @@ val get_diagnose : unit -> bool
 val set_diagnose : bool -> unit 
 
 val set_env : env -> unit
-val cmd_set_module : string -> unit  
+
 val default_gen_tds : bool ref
 
 val no_builtin_ppx_ml : bool ref 

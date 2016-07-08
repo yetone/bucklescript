@@ -29,54 +29,11 @@
 
 
 type env = 
-  | Browser
+  | Browser   
+  (* "browser-internal" used internal *)
   | NodeJS
   | AmdJS
-  | Goog of string option
-
-let default_env = ref NodeJS 
-
-let ext = ref ".js"
-let cmj_ext = ".cmj"
-let get_ext () = !ext 
-let get_env () = !default_env
-
-let set_env env = default_env := env 
-let cmd_set_module str = 
-  match str with 
-  | "commonjs" -> default_env := NodeJS
-  | "amdjs" -> 
-    default_env := AmdJS
-  | "browser-internal" -> (* used internal *)
-    default_env := Browser
-  | _ -> 
-    if Ext_string.starts_with str "goog" then
-      let len = String.length str in
-      if  len = 4  then
-            begin 
-              default_env := Goog (Some "");
-              ext := ".g.js"
-            end
-      else
-      if str.[4] = ':' && len > 5 then 
-        begin 
-          default_env := Goog (Some (Ext_string.tail_from str 5  ));
-          ext := ".g.js";
-        end
-      else 
-        Ext_pervasives.bad_argf "invalid module system %s" str
-    else
-        Ext_pervasives.bad_argf "invalid module system %s" str
-
-
-let get_goog_package_name () = 
-  match !default_env with 
-  | Goog x -> x 
-  | Browser
-  | AmdJS
-  | NodeJS -> None
-
-let npm_package_path = ref None 
+  | Goog (* of string option *)
 
 type path = string 
 
@@ -88,7 +45,27 @@ type package_name  = string
 type packages_info = (package_name * package_info list) option
 (** we don't force people to use package *)
 
-let packages_info = ref None
+let default_env = ref NodeJS 
+
+let ext = ref ".js"
+let cmj_ext = ".cmj"
+let get_ext () = !ext 
+let get_env () = !default_env
+
+let set_env env = default_env := env 
+
+
+let npm_package_path = ref None 
+
+
+let packages_info : packages_info ref = ref None
+
+let get_package_name () = 
+  match !packages_info with 
+  | None -> None
+  | Some(n,_) -> Some n
+
+
 
 let set_package_name name = 
   match !packages_info with
@@ -96,21 +73,28 @@ let set_package_name name =
   | Some _ -> 
     Ext_pervasives.bad_argf "duplicated flag for -bs-package-name"
 
+let cmd_set_module str = 
+  match str with 
+  | "commonjs" -> default_env := NodeJS
+  | "amdjs" -> 
+    default_env := AmdJS
+  | "goog"
+    -> default_env := Goog 
+  | _ ->
+    Ext_pervasives.bad_argf "invalid module system %s" str
+
 let set_npm_package_path s = 
   if !packages_info = None then 
-    Ext_pervasives.bad_argf "please set package name first using -bs-package-name "
-  else 
-    npm_package_path  := Some s 
-  (* match Ext_string.split ~keep_empty:false s ':' with  *)
-  (* | [ package_name; path]  ->  *)
-  (*   if String.length package_name = 0 then    *)
-  (*   (\* TODO: check more [package_name] if it is a valid package name *\) *)
-
-  (*     Ext_pervasives.bad_argf "invalid npm package path: %s" s *)
-  (*   else  *)
-  (*     npm_package_path := Some (package_name, path) *)
-  (* | _ ->  *)
-  (*   Ext_pervasives.bad_argf "invalid npm package path: %s" s *)
+    Ext_pervasives.bad_argf "please set package name first using -bs-package-name ";
+  match Ext_string.split ~keep_empty:false s ':' with
+  | [ package_name; path]  ->
+    cmd_set_module package_name ; 
+    npm_package_path := Some path
+  | [path] ->
+    default_env := NodeJS;
+    npm_package_path := Some path
+  | _ -> 
+    Ext_pervasives.bad_argf "invalid npm package path: %s" s
 
 let get_npm_package_path () = 
   match !packages_info with 

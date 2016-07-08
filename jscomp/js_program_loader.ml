@@ -45,7 +45,7 @@ let string_of_module_id (x : Lam_module_ident.t) : string =
     let id = x.id in
     let file = Printf.sprintf "%s.js" id.name in
     begin match Js_config.get_env () with 
-      | Goog _ -> 
+      | Goog  -> 
         (*TODO: we should store 
           the goog module name in the [cmj] file
         *)
