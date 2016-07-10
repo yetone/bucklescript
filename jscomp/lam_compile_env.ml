@@ -234,7 +234,7 @@ let get_goog_package_name ({ kind; _} as id : Lam_module_ident.t) =
     ~found:(fun x -> x.goog_package)
     
 
-let get_npm_package_path ( id : Lam_module_ident.t) = 
+let get_package_path_from_cmj ( id : Lam_module_ident.t) = 
   query_and_add_if_not_exist id No_env
     ~not_found:(fun _ -> None) 
     ~found:(fun x -> x.npm_package_path)

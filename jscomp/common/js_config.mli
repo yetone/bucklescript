@@ -34,36 +34,59 @@ type env =
   | Goog 
 
 val cmj_ext : string 
+
 val get_env : unit -> env
+val set_env : env -> unit
+
+
 val get_ext : unit -> string
 
 val get_output_dir : string -> string 
 val get_output_file : string -> string
 
 
-val set_npm_package_path : string -> unit 
 
 (** return [package_name] and [path] *)
+val set_npm_package_path : string -> unit 
 val get_npm_package_path : unit -> (string * string) option
 
 val set_package_name : string -> unit 
 val get_package_name : unit -> string option
 
+(** corss module inline option *)
 val cross_module_inline : bool ref
 val set_cross_module_inline : bool -> unit
 val get_cross_module_inline : unit -> bool
   
+(** diagnose option *)
 val diagnose : bool ref 
 val get_diagnose : unit -> bool 
 val set_diagnose : bool -> unit 
 
-val set_env : env -> unit
 
+(** generate tds option *)
 val default_gen_tds : bool ref
 
+(** options for builtion ppx *)
 val no_builtin_ppx_ml : bool ref 
 val no_builtin_ppx_mli : bool ref 
 
+(** check-div-by-zero option *)
+val check_div_by_zero : bool ref 
+val get_check_div_by_zero : unit -> bool 
+
+(* It will imply [-noassert] be set too, note from the implmentation point of view, 
+   in the lambda layer, it is impossible to tell whehther it is [assert (3 <> 2)] or 
+   [if (3<>2) then assert false]
+ *)
+val no_any_assert : bool ref 
+val set_no_any_assert : unit -> unit
+val get_no_any_assert : unit -> bool 
+
+
+
+
+(** Internal use *)
 val runtime_set : String_set.t
 val stdlib_set : String_set.t
 
@@ -108,15 +131,3 @@ val is_same_file : unit -> bool
 
 val tool_name : string
 
-val check_div_by_zero : bool ref 
-
-val get_check_div_by_zero : unit -> bool 
-
-(* It will imply [-noassert] be set too, note from the implmentation point of view, 
-   in the lambda layer, it is impossible to tell whehther it is [assert (3 <> 2)] or 
-   [if (3<>2) then assert false]
- *)
-val no_any_assert : bool ref 
-
-val set_no_any_assert : unit -> unit
-val get_no_any_assert : unit -> bool 

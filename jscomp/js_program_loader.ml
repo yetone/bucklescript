@@ -51,9 +51,7 @@ let string_of_module_id (x : Lam_module_ident.t) : string =
         *)
         let base =  String.uncapitalize id.name in
         begin match Lam_compile_env.get_goog_package_name x with 
-          | None 
-          | Some "" -> 
-            base 
+          | None -> base 
           | Some v -> v ^ "." ^ base 
         end
       | AmdJS
@@ -62,7 +60,7 @@ let string_of_module_id (x : Lam_module_ident.t) : string =
           Ext_filename.node_relative_path 
             (`Dir (Js_config.get_output_dir !Location.input_name)) dep 
         in 
-        begin match Lam_compile_env.get_npm_package_path x
+        begin match Lam_compile_env.get_package_path_from_cmj x
                      with
           | Some (package_name, x) -> 
               let filename = String.uncapitalize id.name in

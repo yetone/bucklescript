@@ -40,11 +40,6 @@ let default_env = ref NodeJS
 type path = string 
 
 type package_info = env * string
-
-  (* | AmdJS of path *)
-  (* | NodeJS of path *)
-  (* | Goog *)
-
 type package_name  = string
 type  packages_info = (package_name * package_info list) option
 (** we don't force people to use package *)
@@ -59,7 +54,7 @@ let get_env () = !default_env
 let set_env env = default_env := env 
 
 
-(* let npm_package_path = ref None  *)
+
 
 
 let packages_info : packages_info ref = ref None
@@ -98,7 +93,7 @@ let set_npm_package_path s =
         Ext_pervasives.bad_argf "invalid npm package path: %s" s
     in
     packages_info := Some (name, (env,path) :: envs)
-    (* default_env := env , npm_package_path := Some path *)
+
 
 
 let get_npm_package_path () = 
